@@ -24,9 +24,15 @@ public class MarkdownStyle {
 		
 	}
 
+	#region Body
+
 	public virtual void Create_P(PUGameObject container, string content) {
 
 	}
+
+	#endregion
+
+	#region Headers
 
 	public virtual void Create_H1(PUGameObject container, string content) {
 		
@@ -52,6 +58,10 @@ public class MarkdownStyle {
 		
 	}
 
+	#endregion
+
+	#region Blockquotes
+
 	public virtual void Begin_Blockquote(PUGameObject container) {
 
 	}
@@ -60,7 +70,43 @@ public class MarkdownStyle {
 		
 	}
 
+	#endregion
 
+	#region Unordered List
+
+	public virtual void Begin_UnorderedList(PUGameObject container) {
+		
+	}
+	
+	public virtual void End_UnorderedList(PUGameObject container) {
+		
+	}
+
+	public virtual void Create_UL_LI(PUGameObject container, string content) {
+		
+	}
+
+	#endregion
+
+	#region Ordered List
+
+	public virtual void Begin_OrderedList(PUGameObject container) {
+		
+	}
+	
+	public virtual void End_OrderedList(PUGameObject container) {
+		
+	}
+	
+	public virtual void Create_OL_LI(PUGameObject container, string content) {
+		
+	}
+
+	#endregion
+
+
+
+	#region Inline tags
 
 	public virtual void Tag_BreakingReturn(PUGameObject container, StringBuilder content) {
 		content.Append ("\n");
@@ -81,5 +127,7 @@ public class MarkdownStyle {
 			content.Append ("</b>");
 		}
 	}
-	
+
+	#endregion
+
 }

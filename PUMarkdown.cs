@@ -45,11 +45,15 @@ public class PUMarkdown : PUScrollRect {
 	public override void gaxb_complete () {
 		base.gaxb_complete ();
 
-		ScheduleForStart ();
+		ScheduleForUpdate ();
 	}
 
-	public override void Start() {
-		LoadMarkdown(value);
+	private float lastWidth = 0;
+	public override void Update () {
+		if (lastWidth != rectTransform.rect.size.x) {
+			lastWidth = rectTransform.rect.size.x;
+			LoadMarkdown(value);
+		}
 	}
 
 	public void LoadMarkdown(string content) {
@@ -69,6 +73,10 @@ public class PUMarkdown : PUScrollRect {
 		StringBuilder currentString = new StringBuilder ();
 		BlockType currentBlockType = BlockType.Blank;
 		PUGameObject container = this as PUGameObject;
+		RectTransform containerRT = contentObject.transform as RectTransform;
+		Stack<BlockType> listStack = new Stack<BlockType>();
+
+		container.size = containerRT.rect.size;
 
 		Action CommitMarkdownBlock = () => {
 
@@ -108,7 +116,49 @@ public class PUMarkdown : PUScrollRect {
 				style.End_Blockquote(container);
 			}
 
+			if (currentBlockType == BlockType.ul) {
+				listStack.Push(currentBlockType);
+				style.Begin_UnorderedList(container);
+			}
+			
+			if (currentBlockType == BlockType.ul_end) {
+				listStack.Pop();
+				style.End_UnorderedList(container);
+			}
+
+			if (currentBlockType == BlockType.ul_li) {
+				style.Create_UL_LI(container, currentString.ToString());
+			}
+
+			if (currentBlockType == BlockType.ol) {
+				listStack.Push(currentBlockType);
+				style.Begin_OrderedList(container);
+			}
+			
+			if (currentBlockType == BlockType.ol_end) {
+				listStack.Pop();
+				style.End_OrderedList(container);
+			}
+			
+			if (currentBlockType == BlockType.ol_li) {
+				style.Create_OL_LI(container, currentString.ToString());
+			}
+
+			// This one is tricky; MarkdownDeep doesn't seem to handle well OL and UL following each
+			// other and returns LI instead of OL_LI or UL_LI. So, we try and determine which one we're in.
+			// and send that instead...
+			/*
+			if (currentBlockType == BlockType.li) {
+				BlockType tempType = listStack.Peek();
+				if(tempType == BlockType.ul)
+					style.Create_UL_LI(container, currentString.ToString());
+				if(tempType == BlockType.ol)
+					style.Create_OL_LI(container, currentString.ToString());
+			}*/
+
 		};
+
+		style.Begin (container);
 
 		string htmlTranslation = md.Transform (content, out definitions, (block, token, tokenString) => {
 
@@ -155,6 +205,8 @@ public class PUMarkdown : PUScrollRect {
 		});
 
 		CommitMarkdownBlock();
+
+		style.End (container);
 
 		CalculateContentSize ();
 
