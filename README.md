@@ -1,2 +1,2 @@
 # PUMarkdown
-A custom element for PlanetUnity2 which brings the power of markdown to PU.
+A custom element for PlanetUnity2 which brings the power of markdown to PU. Utilizes the open source project [MarkdownDeep](http://www.toptensoftware.com/markdowndeep/) to provide comprehensive parsing of Markdown strings coupled with custom hooks to generate custom PlanetUnity elements.

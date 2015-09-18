@@ -55,6 +55,15 @@ namespace MarkdownDeep
 		dl,				// render only
 		footnote,		// footnote definition  eg: [^id]   `data` holds the footnote id
 		p_footnote,		// paragraph with footnote return link append.  Return link string is in `data`.
+
+
+
+
+		quote_end,		// end of quoted content
+		ol_end,			// end of ordered list
+		ul_end,			// end of unordered list
+		li_end,			// end of unordered list
+		HtmlTag_end,			// end of unordered list
 	}
 
 	public class Block
@@ -109,7 +118,7 @@ namespace MarkdownDeep
 			}
 		}
 
-		public void RenderChildrenPlain(Markdown m, StringBuilder b, Action<Block,Token> customProcess)
+		public void RenderChildrenPlain(Markdown m, StringBuilder b, Action<Block,Token,string> customProcess)
 		{
 			foreach (var block in children)
 			{
@@ -341,10 +350,10 @@ namespace MarkdownDeep
 			}
 		}
 
-		public void RenderPlain(Markdown m, StringBuilder b, Action<Block,Token> customProcess)
+		public void RenderPlain(Markdown m, StringBuilder b, Action<Block,Token,string> customProcess)
 		{
 			if(customProcess != null) {
-				customProcess(this, null);
+				customProcess(this, null, null);
 			}
 
 			switch (blockType)
@@ -416,11 +425,34 @@ namespace MarkdownDeep
 					return;
 
 				case BlockType.quote:
+					RenderChildrenPlain(m, b, customProcess);
+					if(customProcess != null) {
+						customProcess(new Block(BlockType.quote_end), null, null);
+					}
+					return;
 				case BlockType.li:
+					RenderChildrenPlain(m, b, customProcess);
+					if(customProcess != null) {
+						customProcess(new Block(BlockType.li_end), null, null);
+					}
+					return;
 				case BlockType.ol:
+					RenderChildrenPlain(m, b, customProcess);
+					if(customProcess != null) {
+						customProcess(new Block(BlockType.ol_end), null, null);
+					}
+					return;
 				case BlockType.ul:
+					RenderChildrenPlain(m, b, customProcess);
+					if(customProcess != null) {
+						customProcess(new Block(BlockType.ul_end), null, null);
+					}
+					return;
 				case BlockType.HtmlTag:
 					RenderChildrenPlain(m, b, customProcess);
+					if(customProcess != null) {
+						customProcess(new Block(BlockType.HtmlTag_end), null, null);
+					}
 					return;
 			}
 		}

@@ -65,7 +65,7 @@ namespace MarkdownDeep
 		}
 
 		// Transform a string
-		public string Transform(string str, out Dictionary<string, LinkDefinition> definitions, Action<Block,Token> customProcess)
+		public string Transform(string str, out Dictionary<string, LinkDefinition> definitions, Action<Block,Token,string> customProcess)
 		{
 			// Build blocks
 			var blocks = ProcessBlocks(str);

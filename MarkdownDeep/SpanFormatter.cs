@@ -86,7 +86,7 @@ namespace MarkdownDeep
 			Render(dest, str);
 		}
 
-		public void FormatPlain(StringBuilder dest, string str, int start, int len, Action<Block,Token> customProcess)
+		public void FormatPlain(StringBuilder dest, string str, int start, int len, Action<Block,Token,string> customProcess)
 		{
 			// Parse the string into a list of tokens
 			Tokenize(str, start, len);
@@ -269,12 +269,12 @@ namespace MarkdownDeep
 		}
 
 		// Render a list of tokens to a destinatino string builder.
-		private void RenderPlain(StringBuilder sb, string str, Action<Block,Token> customProcess)
+		private void RenderPlain(StringBuilder sb, string str, Action<Block,Token,string> customProcess)
 		{
 			foreach (Token t in m_Tokens)
 			{
 				if(customProcess != null){
-					customProcess(null, t);
+					customProcess(null, t, str);
 				}
 				switch (t.type)
 				{
