@@ -461,7 +461,9 @@ namespace MarkdownDeep
 
 				case BlockType.ol_li:
 				case BlockType.ul_li:
-					blocks.Add(BuildList(lines));
+					while(lines.Count > 0 && (lines[0].blockType == BlockType.ol_li || lines[0].blockType == BlockType.ul_li)){
+						blocks.Add(BuildList(lines));
+					}
 					break;
 
 				case BlockType.dd:
@@ -1292,9 +1294,20 @@ namespace MarkdownDeep
 			List.children = new List<Block>();
 
 			// Process all lines in the range		
+			int last_i = lines.Count;
 			for (int i = 0; i < lines.Count; i++)
 			{
 				System.Diagnostics.Debug.Assert(lines[i].blockType == BlockType.ul_li || lines[i].blockType==BlockType.ol_li);
+
+				if(List.blockType == BlockType.ul && lines[i].blockType == BlockType.ol_li){
+					last_i = i-1;
+					break;
+				}
+
+				if(List.blockType == BlockType.ol && lines[i].blockType == BlockType.ul_li){
+					last_i = i-1;
+					break;
+				}
 
 				// Find start of item, including leading blanks
 				int start_of_li = i;
@@ -1307,7 +1320,7 @@ namespace MarkdownDeep
 					end_of_li++;
 
 				// Is this a simple or complex list item?
-				if (start_of_li == end_of_li)
+				if (start_of_li == end_of_li-1 || start_of_li == end_of_li)
 				{
 					// It's a simple, single line item item
 					System.Diagnostics.Debug.Assert(start_of_li == i);
@@ -1354,8 +1367,15 @@ namespace MarkdownDeep
 				i = end_of_li;
 			}
 
-			FreeBlocks(lines);
-			lines.Clear();
+			for (int i = 0; i < last_i; i++) {
+				FreeBlock(lines[0]);
+				lines.RemoveAt(0);
+			}
+
+			while (lines.Count > 0 && lines[0].blockType == BlockType.Blank) {
+				FreeBlock(lines[0]);
+				lines.RemoveAt(0);
+			}
 
 			// Continue processing after this item
 			return List;
