@@ -71,7 +71,7 @@ public class PUMarkdown : PUScrollRect {
 
 		// Our job is to interface with MarkdownDeep, grab the necessary bits, and call the simplied API in MarkdownStyle
 		StringBuilder currentString = new StringBuilder ();
-		BlockType currentBlockType = BlockType.Blank;
+		Block currentBlock = null;
 		PUGameObject container = this as PUGameObject;
 		RectTransform containerRT = contentObject.transform as RectTransform;
 		Stack<BlockType> listStack = new Stack<BlockType>();
@@ -80,73 +80,83 @@ public class PUMarkdown : PUScrollRect {
 
 		Action CommitMarkdownBlock = () => {
 
-			if (currentBlockType == BlockType.p) {
+			if (currentBlock == null) {
+				return;
+			}
+
+			if (currentBlock.blockType == BlockType.p) {
 				style.Create_P(container, currentString.ToString());
 			}
 
-			if (currentBlockType == BlockType.h1) {
+			if (currentBlock.blockType == BlockType.h1) {
 				style.Create_H1(container, currentString.ToString());
 			}
 
-			if (currentBlockType == BlockType.h2) {
+			if (currentBlock.blockType == BlockType.h2) {
 				style.Create_H2(container, currentString.ToString());
 			}
 
-			if (currentBlockType == BlockType.h3) {
+			if (currentBlock.blockType == BlockType.h3) {
 				style.Create_H3(container, currentString.ToString());
 			}
 
-			if (currentBlockType == BlockType.h4) {
+			if (currentBlock.blockType == BlockType.h4) {
 				style.Create_H4(container, currentString.ToString());
 			}
 
-			if (currentBlockType == BlockType.h5) {
+			if (currentBlock.blockType == BlockType.h5) {
 				style.Create_H5(container, currentString.ToString());
 			}
 
-			if (currentBlockType == BlockType.h6) {
+			if (currentBlock.blockType == BlockType.h6) {
 				style.Create_H6(container, currentString.ToString());
 			}
 
-			if (currentBlockType == BlockType.hr) {
+			if (currentBlock.blockType == BlockType.hr) {
 				style.Create_HR(container);
 			}
 
-			if (currentBlockType == BlockType.quote) {
+			if (currentBlock.blockType == BlockType.quote) {
 				style.Begin_Blockquote(container);
 			}
 
-			if (currentBlockType == BlockType.quote_end) {
+			if (currentBlock.blockType == BlockType.quote_end) {
 				style.End_Blockquote(container);
 			}
 
-			if (currentBlockType == BlockType.ul) {
-				listStack.Push(currentBlockType);
+			if (currentBlock.blockType == BlockType.ul) {
+				listStack.Push(currentBlock.blockType);
 				style.Begin_UnorderedList(container);
 			}
 			
-			if (currentBlockType == BlockType.ul_end) {
+			if (currentBlock.blockType == BlockType.ul_end) {
 				listStack.Pop();
 				style.End_UnorderedList(container);
 			}
 
-			if (currentBlockType == BlockType.ul_li) {
+			if (currentBlock.blockType == BlockType.ul_li) {
 				style.Create_UL_LI(container, currentString.ToString());
 			}
 
-			if (currentBlockType == BlockType.ol) {
-				listStack.Push(currentBlockType);
+			if (currentBlock.blockType == BlockType.ol) {
+				listStack.Push(currentBlock.blockType);
 				style.Begin_OrderedList(container);
 			}
 			
-			if (currentBlockType == BlockType.ol_end) {
+			if (currentBlock.blockType == BlockType.ol_end) {
 				listStack.Pop();
 				style.End_OrderedList(container);
 			}
 			
-			if (currentBlockType == BlockType.ol_li) {
+			if (currentBlock.blockType == BlockType.ol_li) {
 				style.Create_OL_LI(container, currentString.ToString());
 			}
+
+			if (currentBlock.blockType == BlockType.codeblock) {
+				style.Create_CodeBlock(container, currentBlock.Content);
+			}
+
+
 		};
 
 		style.Begin (container);
@@ -154,11 +164,11 @@ public class PUMarkdown : PUScrollRect {
 		string htmlTranslation = md.Transform (content, out definitions, (block, token, tokenString) => {
 
 			if(block != null){
-				Debug.Log ("block: " + block.blockType);
+				Debug.Log ("block: " + block.blockType + " :: " + block.Content);
 
 				CommitMarkdownBlock();
 
-				currentBlockType = block.blockType;
+				currentBlock = block;
 
 				currentString.Length = 0;
 			}
@@ -170,6 +180,12 @@ public class PUMarkdown : PUScrollRect {
 					currentString.Append(tokenString, token.startOffset, token.length);
 				}
 
+
+				if(token.type == TokenType.code_span){
+					style.Tag_Code(container, currentString, true);
+					currentString.Append(tokenString, token.startOffset, token.length);
+					style.Tag_Code(container, currentString, false);
+				}
 
 				if(token.type == TokenType.open_strong){
 					style.Tag_Strong(container, currentString, true);

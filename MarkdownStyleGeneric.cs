@@ -79,6 +79,44 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	
 	#endregion
 
+	#region CodeBlock
+	
+	public override void Create_CodeBlock(PUGameObject container, string content) {
+
+		float margin = 10;
+
+		padding.left += fontSize * 2.0f;
+		padding.right += fontSize * 2.0f;
+
+		float oldY = currentY;
+
+		PUTMPro text = AddTextWithOptions (container, content, textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
+
+		PUColor outlineColor = new PUColor ();
+		outlineColor.color = Color.black.PUParse ("#ccccccff");
+		outlineColor.SetFrame (padding.left,oldY-fontSize,text.rectTransform.sizeDelta.x + margin * 2.0f,text.rectTransform.sizeDelta.y + margin * 2.0f,0,1,"top,left");
+		outlineColor.LoadIntoPUGameObject (container);
+
+		PUColor backgroundColor = new PUColor ();
+		backgroundColor.color = Color.black.PUParse ("#f8f8f8ff");
+		backgroundColor.SetFrame (0,0,0,0,0,0,"stretch,stretch");
+		backgroundColor.LoadIntoPUGameObject (outlineColor);
+		backgroundColor.SetStretchStretch (1, 1, 1, 1);
+
+		text.rectTransform.SetParent (outlineColor.rectTransform, false);
+		text.rectTransform.pivot = Vector2.zero;
+		text.rectTransform.anchorMax = Vector2.one;
+		text.rectTransform.anchorMin = Vector2.zero;
+		text.SetStretchStretch (margin, margin, margin, margin);
+
+		padding.left -= fontSize * 2.0f;
+		padding.right -= fontSize * 2.0f;
+
+		currentY -= margin;
+	}
+	
+	#endregion
+
 	#region BLOCKQUOTE
 
 	public override void Begin_Blockquote(PUGameObject container) {
@@ -121,10 +159,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		padding.left += fontSize * 2.0f;
 		Create_P(container, content);
 		padding.left -= fontSize * 2.0f;
-		
-		
-		RectTransform lineText = container.rectTransform.GetChild (container.rectTransform.childCount - 1) as RectTransform;
-		
+
 		PUTMPro text = new PUTMPro ();
 		text.SetFrame (padding.left, currentY - padding.top, fontSize * 1.5f, (oldY - currentY) - fontSize, 0, 0, "top,left");
 		text.font = font;
@@ -166,9 +201,6 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		Create_P(container, content);
 		padding.left -= fontSize * 2.0f;
 
-
-		RectTransform lineText = container.rectTransform.GetChild (container.rectTransform.childCount - 1) as RectTransform;
-
 		PUTMPro text = new PUTMPro ();
 		text.SetFrame (padding.left, currentY - padding.top, fontSize * 1.5f, (oldY - currentY) - fontSize, 0, 0, "top,left");
 		text.font = font;
@@ -190,7 +222,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	#region Utility
 
-	public void AddTextWithOptions(PUGameObject container, string content, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
+	public PUTMPro AddTextWithOptions(PUGameObject container, string content, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
 
 		currentY -= paragraphSpacing;
 
@@ -209,6 +241,8 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		text.rectTransform.sizeDelta = text.CalculateTextSize (content, maxWidth);
 		
 		currentY -= text.rectTransform.sizeDelta.y + padding.bottom;
+
+		return text;
 	}
 
 	public Color textColor() {

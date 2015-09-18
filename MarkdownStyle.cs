@@ -68,6 +68,14 @@ public class MarkdownStyle {
 
 	#endregion
 
+	#region CodeBlock
+	
+	public virtual void Create_CodeBlock(PUGameObject container, string content) {
+		
+	}
+	
+	#endregion
+
 	#region Blockquotes
 
 	public virtual void Begin_Blockquote(PUGameObject container) {
@@ -133,6 +141,14 @@ public class MarkdownStyle {
 			content.Append ("<b>");
 		} else {
 			content.Append ("</b>");
+		}
+	}
+
+	public virtual void Tag_Code(PUGameObject container, StringBuilder content, bool isOpen) {
+		if (isOpen) {
+			content.Append ("<u>");
+		} else {
+			content.Append ("</u>");
 		}
 	}
 
