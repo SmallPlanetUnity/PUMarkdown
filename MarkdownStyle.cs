@@ -60,6 +60,14 @@ public class MarkdownStyle {
 
 	#endregion
 
+	#region Horizontal Rule
+
+	public virtual void Create_HR(PUGameObject container) {
+		
+	}
+
+	#endregion
+
 	#region Blockquotes
 
 	public virtual void Begin_Blockquote(PUGameObject container) {

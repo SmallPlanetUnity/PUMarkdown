@@ -9,6 +9,12 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	public float fontSize = 18;
 	public string font = "Fonts/ArialRegular";
 
+	public float paragraphSpacing {
+		get {
+			return fontSize;
+		}
+	}
+
 	private float currentY = 0;
 	private Padding padding = new Padding (0, 0, 0, 0);
 
@@ -58,6 +64,19 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		AddTextWithOptions (container, content, Color.grey, 1.0f, "Bold", TMPro.TextAlignmentOptions.Left);
 	}
 
+	#endregion
+
+	#region Horizontal Rule
+	
+	public override void Create_HR(PUGameObject container) {
+		currentY -= paragraphSpacing;
+
+		PUColor color = new PUColor ();
+		color.color = new Color(0.8f, 0.8f, 0.8f, 1.0f);
+		color.SetFrame (padding.left + 2, currentY, 0, 1, 0, 0, "top,left");
+		color.LoadIntoPUGameObject (container);
+	}
+	
 	#endregion
 
 	#region BLOCKQUOTE
@@ -173,7 +192,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	public void AddTextWithOptions(PUGameObject container, string content, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
 
-		currentY -= fontSize;
+		currentY -= paragraphSpacing;
 
 		float maxWidth = container.size.Value.x - (padding.left + padding.right);
 		

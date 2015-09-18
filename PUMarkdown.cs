@@ -108,6 +108,10 @@ public class PUMarkdown : PUScrollRect {
 				style.Create_H6(container, currentString.ToString());
 			}
 
+			if (currentBlockType == BlockType.hr) {
+				style.Create_HR(container);
+			}
+
 			if (currentBlockType == BlockType.quote) {
 				style.Begin_Blockquote(container);
 			}
@@ -143,19 +147,6 @@ public class PUMarkdown : PUScrollRect {
 			if (currentBlockType == BlockType.ol_li) {
 				style.Create_OL_LI(container, currentString.ToString());
 			}
-
-			// This one is tricky; MarkdownDeep doesn't seem to handle well OL and UL following each
-			// other and returns LI instead of OL_LI or UL_LI. So, we try and determine which one we're in.
-			// and send that instead...
-			/*
-			if (currentBlockType == BlockType.li) {
-				BlockType tempType = listStack.Peek();
-				if(tempType == BlockType.ul)
-					style.Create_UL_LI(container, currentString.ToString());
-				if(tempType == BlockType.ol)
-					style.Create_OL_LI(container, currentString.ToString());
-			}*/
-
 		};
 
 		style.Begin (container);
