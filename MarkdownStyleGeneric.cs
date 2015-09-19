@@ -52,6 +52,22 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	#endregion
 
+	#region Definitions
+	
+	public override void Create_DefinitionTerm(PUGameObject container, string content) {
+		AddTextWithOptions (container, content, textColor(), 1.0f, "BoldItalic", TMPro.TextAlignmentOptions.Left);
+	}
+	
+	public override void Create_DefinitionData(PUGameObject container, string content) {
+		currentY += fontSize * 0.8f;
+
+		padding.left += fontSize * 1.0f;
+		AddTextWithOptions (container, content, textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
+		padding.left -= fontSize * 1.0f;
+	}
+	
+	#endregion
+
 	#region HEADERS
 
 	public override void Create_H1(PUGameObject container, string content) {
@@ -240,13 +256,9 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 			}
 		}
 
-		Debug.Log ("numberOfRows: " + numberOfRows);
-		Debug.Log ("numberOfCols: " + numberOfCols);
-
 		tableGroup.layout.cellSize = new Vector2 (maxCellWidth, maxCellHeight);
 		tableGroup.rectTransform.sizeDelta = new Vector2 (maxCellWidth * numberOfCols, maxCellHeight * numberOfRows);
 		currentY = savedY - tableGroup.rectTransform.sizeDelta.y;
-
 	}
 	
 	#endregion

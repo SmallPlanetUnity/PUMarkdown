@@ -172,6 +172,14 @@ public class PUMarkdown : PUScrollRect {
 				style.Create_Table(container, currentBlock.data as TableSpec);
 			}
 
+			if(currentBlock.blockType == BlockType.dt){
+				style.Create_DefinitionTerm(container, currentString.ToString());
+			}
+
+			if(currentBlock.blockType == BlockType.dd){
+				style.Create_DefinitionData(container, currentString.ToString());
+			}
+
 		};
 
 		style.Begin (container);
@@ -179,7 +187,7 @@ public class PUMarkdown : PUScrollRect {
 		string htmlTranslation = md.Transform (content, out definitions, (block, token, tokenString) => {
 
 			if(block != null){
-				Debug.Log ("block: " + block.blockType + " :: " + block.Content);
+				//Debug.Log ("block: " + block.blockType + " :: " + block.Content);
 
 				CommitMarkdownBlock();
 
@@ -189,7 +197,7 @@ public class PUMarkdown : PUScrollRect {
 			}
 
 			if(token != null) {
-				Debug.Log ("token: " + token.type);
+				//Debug.Log ("token: " + token.type);
 
 				if(token.type == TokenType.img){
 

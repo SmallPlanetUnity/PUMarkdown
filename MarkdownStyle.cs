@@ -77,6 +77,19 @@ public class MarkdownStyle {
 
 	#endregion
 
+	#region Definitions
+	
+	public virtual void Create_DefinitionTerm(PUGameObject container, string content) {
+		
+	}
+
+	public virtual void Create_DefinitionData(PUGameObject container, string content) {
+		
+	}
+	
+	#endregion
+
+
 	#region Headers
 
 	public virtual void Create_H1(PUGameObject container, string content) {
