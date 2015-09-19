@@ -3,8 +3,10 @@ using UnityEngine;
 using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
+using MarkdownDeep;
 
 public class MarkdownStyleGeneric : MarkdownStyle {
+
 
 	public float fontSize = 18;
 	public string font = "Fonts/ArialRegular";
@@ -66,6 +68,35 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	#endregion
 
+	#region Image
+	
+	public override void Create_IMG(PUGameObject container, string url, string title) {
+
+		Vector2 size = new Vector2 (100, 100);
+		if (title.Contains (",")) {
+			size = Vector2.zero.PUParse(title);
+		}
+
+		currentY -= paragraphSpacing;
+
+		PURawImage img = new PURawImage ();
+		img.SetFrame (padding.left, currentY - padding.top, size.x, size.y, 0, 1, "top,left");
+		img.LoadIntoPUGameObject (container);
+
+		MarkdownRemoteImageLoader loader = img.gameObject.AddComponent<MarkdownRemoteImageLoader> ();
+		loader.path = url;
+		loader.onComplete = () => {
+			// now that we have this image, adjust the size?
+			int w = img.image.texture.width;
+			int h = img.image.texture.height;
+			img.rectTransform.sizeDelta = new Vector2(w, h);
+		};
+
+		currentY -= size.y;
+	}
+	
+	#endregion
+
 	#region Horizontal Rule
 	
 	public override void Create_HR(PUGameObject container) {
@@ -88,31 +119,122 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		padding.left += fontSize * 2.0f;
 		padding.right += fontSize * 2.0f;
 
-		float oldY = currentY;
-
 		PUTMPro text = AddTextWithOptions (container, content, textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
 
-		PUColor outlineColor = new PUColor ();
-		outlineColor.color = Color.black.PUParse ("#ccccccff");
-		outlineColor.SetFrame (padding.left,oldY-fontSize,text.rectTransform.sizeDelta.x + margin * 2.0f,text.rectTransform.sizeDelta.y + margin * 2.0f,0,1,"top,left");
-		outlineColor.LoadIntoPUGameObject (container);
-
-		PUColor backgroundColor = new PUColor ();
-		backgroundColor.color = Color.black.PUParse ("#f8f8f8ff");
-		backgroundColor.SetFrame (0,0,0,0,0,0,"stretch,stretch");
-		backgroundColor.LoadIntoPUGameObject (outlineColor);
-		backgroundColor.SetStretchStretch (1, 1, 1, 1);
-
-		text.rectTransform.SetParent (outlineColor.rectTransform, false);
-		text.rectTransform.pivot = Vector2.zero;
-		text.rectTransform.anchorMax = Vector2.one;
-		text.rectTransform.anchorMin = Vector2.zero;
-		text.SetStretchStretch (margin, margin, margin, margin);
+		PutTextInBox (container, text, margin, new Color32 (204, 204, 204, 255), new Color32 (248, 248, 248, 255));
 
 		padding.left -= fontSize * 2.0f;
 		padding.right -= fontSize * 2.0f;
 
 		currentY -= margin;
+	}
+	
+	#endregion
+
+	#region Table
+	
+	public override void Create_Table(PUGameObject container, TableSpec spec) {
+
+		float margin = fontSize;
+
+		currentY -= paragraphSpacing;
+
+		float savedY = currentY;
+
+		PUGridLayoutGroup tableGroup = new PUGridLayoutGroup();
+		tableGroup.SetFrame (padding.left+2, currentY, container.size.Value.x, 100, 0, 1, "top,left");
+		tableGroup.LoadIntoPUGameObject (container);
+
+		// Fill out the group, then figure out the height / widths needed based upon the content
+		float maxCellWidth = 0;
+		float maxCellHeight = 0;
+		int numberOfCols = 0;
+		int numberOfRows = 0;
+
+		for(int i = 0; i < spec.Headers.Count; i++) {
+			string header = spec.Headers[i];
+			ColumnAlignment alignment = spec.Columns[i];
+
+			TMPro.TextAlignmentOptions tmAlignment = TMPro.TextAlignmentOptions.Left;
+			if(alignment == ColumnAlignment.Right){
+				tmAlignment = TMPro.TextAlignmentOptions.Right;
+			}
+			if(alignment == ColumnAlignment.Center){
+				tmAlignment = TMPro.TextAlignmentOptions.Center;
+			}
+
+			PUTMPro text = AddTextWithOptions (tableGroup, header, textColor(), 1.0f, "Bold", tmAlignment);
+			Vector2 size = text.rectTransform.sizeDelta + new Vector2(margin*2.0f,margin);
+
+			text.rectTransform.pivot = Vector2.zero;
+			text.rectTransform.anchorMax = Vector2.one;
+			text.rectTransform.anchorMin = Vector2.zero;
+
+			PutTextInBox (tableGroup, text, 2, new Color32 (204, 204, 204, 255), new Color32 (255, 255, 255, 255));
+			text.SetStretchStretch (margin*0.5f, margin, margin*0.5f, margin);
+
+			if(size.x > maxCellWidth){
+				maxCellWidth = size.x;
+			}
+			if(size.y > maxCellHeight){
+				maxCellHeight = size.y;
+			}
+		}
+
+		numberOfCols = spec.Rows[0].Count;
+		numberOfRows = spec.Rows.Count;
+
+		if (spec.Headers.Count > 0) {
+			numberOfRows++;
+		}
+		
+		for(int i = 0; i < spec.Rows.Count; i++) {
+			List<string> rows = spec.Rows[i];
+
+			for(int j = 0; j < rows.Count; j++) {
+				string row = rows[j];
+
+				ColumnAlignment alignment = spec.Columns[j];
+				
+				TMPro.TextAlignmentOptions tmAlignment = TMPro.TextAlignmentOptions.Left;
+				if(alignment == ColumnAlignment.Right){
+					tmAlignment = TMPro.TextAlignmentOptions.Right;
+				}
+				if(alignment == ColumnAlignment.Center){
+					tmAlignment = TMPro.TextAlignmentOptions.Center;
+				}
+
+
+				PUTMPro text = AddTextWithOptions (tableGroup, row, textColor(), 1.0f, "Normal", tmAlignment);
+				Vector2 size = text.rectTransform.sizeDelta + new Vector2(margin*2.0f,margin);
+
+				text.rectTransform.pivot = Vector2.zero;
+				text.rectTransform.anchorMax = Vector2.one;
+				text.rectTransform.anchorMin = Vector2.zero;
+
+				if(i % 2 != 0){
+					PutTextInBox (tableGroup, text, 2, new Color32 (204, 204, 204, 255), new Color32 (248, 248, 248, 255));
+				}else{
+					PutTextInBox (tableGroup, text, 2, new Color32 (204, 204, 204, 255), new Color32 (255, 255, 255, 255));
+				}
+				text.SetStretchStretch (margin*0.5f, margin, margin*0.5f, margin);
+
+				if(size.x > maxCellWidth){
+					maxCellWidth = size.x;
+				}
+				if(size.y > maxCellHeight){
+					maxCellHeight = size.y;
+				}
+			}
+		}
+
+		Debug.Log ("numberOfRows: " + numberOfRows);
+		Debug.Log ("numberOfCols: " + numberOfCols);
+
+		tableGroup.layout.cellSize = new Vector2 (maxCellWidth, maxCellHeight);
+		tableGroup.rectTransform.sizeDelta = new Vector2 (maxCellWidth * numberOfCols, maxCellHeight * numberOfRows);
+		currentY = savedY - tableGroup.rectTransform.sizeDelta.y;
+
 	}
 	
 	#endregion
@@ -237,8 +359,9 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		text.alignment = alignment;
 		text.value = content;
 		text.LoadIntoPUGameObject (container);
-		
-		text.rectTransform.sizeDelta = text.CalculateTextSize (content, maxWidth);
+
+		Vector2 size = text.CalculateTextSize (content, maxWidth);
+		text.rectTransform.sizeDelta = size;
 		
 		currentY -= text.rectTransform.sizeDelta.y + padding.bottom;
 
@@ -249,10 +372,31 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		Color color = Color.black;
 		
 		if (blockquotesTop.Count > 0) {
-			color = new Color(0.8f, 0.8f, 0.8f, 1.0f);
+			color = Color.grey;
 		}
 
 		return color;
+	}
+
+	public void PutTextInBox(PUGameObject container, PUTMPro text, float margin, Color outlineColor, Color backgroundColor) {
+
+		PUColor outlineColorGO = new PUColor ();
+		outlineColorGO.color = outlineColor;
+		outlineColorGO.SetFrame (text.rectTransform.anchoredPosition.x,text.rectTransform.anchoredPosition.y,text.rectTransform.sizeDelta.x + margin * 2.0f,text.rectTransform.sizeDelta.y + margin * 2.0f,0,1,"top,left");
+		outlineColorGO.LoadIntoPUGameObject (container);
+
+		PUColor backgroundColorGO = new PUColor ();
+		backgroundColorGO.color = backgroundColor;
+		backgroundColorGO.SetFrame (0, 0, 0, 0, 0, 0, "stretch,stretch");
+		backgroundColorGO.LoadIntoPUGameObject (outlineColorGO);
+		backgroundColorGO.SetStretchStretch (1, 1, 1, 1);
+
+		text.rectTransform.SetParent (outlineColorGO.rectTransform, false);
+		text.rectTransform.pivot = Vector2.zero;
+		text.rectTransform.anchorMax = Vector2.one;
+		text.rectTransform.anchorMin = Vector2.zero;
+		text.SetStretchStretch (margin, margin, margin, margin);
+
 	}
 
 	#endregion

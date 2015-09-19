@@ -156,6 +156,9 @@ public class PUMarkdown : PUScrollRect {
 				style.Create_CodeBlock(container, currentBlock.Content);
 			}
 
+			if(currentBlock.blockType == BlockType.table_spec){
+				style.Create_Table(container, currentBlock.data as TableSpec);
+			}
 
 		};
 
@@ -175,6 +178,12 @@ public class PUMarkdown : PUScrollRect {
 
 			if(token != null) {
 				Debug.Log ("token: " + token.type);
+
+				if(token.type == TokenType.img){
+
+					LinkInfo link = token.data as LinkInfo;
+					style.Create_IMG(container, link.def.url, link.link_text);
+				}
 
 				if(token.type == TokenType.Text){
 					currentString.Append(tokenString, token.startOffset, token.length);

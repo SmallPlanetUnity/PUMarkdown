@@ -3,6 +3,9 @@ using UnityEngine;
 using System.Xml;
 using System.Collections;
 using System.Text;
+using UnityEngine.UI;
+using System;
+using MarkdownDeep;
 
 public struct Padding {
 	public float left, right, bottom, top;
@@ -11,6 +14,36 @@ public struct Padding {
 		this.top = top;
 		this.right = right;
 		this.bottom = bottom;
+	}
+}
+
+public class MarkdownRemoteImageLoader : MonoBehaviour {
+	public string path;
+	public Action onComplete;
+	private WWW www;
+	
+	void Start() {
+		if (path.StartsWith ("http://") || path.StartsWith ("https://")) {
+			www = new WWW (path);
+			return;
+		}
+		www = new WWW ("file://" + path);
+	}
+	
+	void Update() {
+		if (www.isDone) {
+			RawImage rawImage = GetComponent<RawImage>();
+			if(rawImage != null){
+				rawImage.texture = www.texture;
+				rawImage.texture.wrapMode = TextureWrapMode.Clamp;
+				if(onComplete != null){
+					onComplete();
+				}
+			}
+			
+			www.Dispose();
+			GameObject.Destroy (this);
+		}
 	}
 }
 
@@ -60,6 +93,14 @@ public class MarkdownStyle {
 
 	#endregion
 
+	#region Image
+	
+	public virtual void Create_IMG(PUGameObject container, string url, string title) {
+		
+	}
+	
+	#endregion
+
 	#region Horizontal Rule
 
 	public virtual void Create_HR(PUGameObject container) {
@@ -71,6 +112,14 @@ public class MarkdownStyle {
 	#region CodeBlock
 	
 	public virtual void Create_CodeBlock(PUGameObject container, string content) {
+		
+	}
+	
+	#endregion
+
+	#region Table
+	
+	public virtual void Create_Table(PUGameObject container, TableSpec table) {
 		
 	}
 	
