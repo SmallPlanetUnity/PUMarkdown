@@ -58,6 +58,8 @@ public class PUMarkdown : PUScrollRect {
 		base.gaxb_complete ();
 
 		ScheduleForUpdate ();
+
+		Update ();
 	}
 
 	private float lastWidth = 0;
