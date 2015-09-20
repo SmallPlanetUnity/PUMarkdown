@@ -78,7 +78,7 @@ public class PUMarkdown : PUScrollRect {
 
 		md.ExtraMode = true;
 
-		Debug.Log ("value: " + content);
+		//Debug.Log ("value: " + content);
 
 
 		// Our job is to interface with MarkdownDeep, grab the necessary bits, and call the simplied API in MarkdownStyle
@@ -250,8 +250,6 @@ public class PUMarkdown : PUScrollRect {
 		style.End (container);
 
 		CalculateContentSize ();
-
-		Debug.Log ("html: " + htmlTranslation);
 	}
 
 }
