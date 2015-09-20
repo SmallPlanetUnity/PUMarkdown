@@ -61,6 +61,8 @@ public class MarkdownRemoteImageLoader : MonoBehaviour {
 
 public class MarkdownStyle {
 
+	public PUMarkdown markdownEntity;
+
 	public virtual void Begin(PUGameObject container) {
 		
 	}

@@ -21,30 +21,35 @@ using System.Text;
 
 public class PUMarkdown : PUScrollRect {
 
-	public MarkdownStyle style;
+	private MarkdownStyle mdStyle;
+
+	public Action<string> onLinkClicked;
+
+	public string style;
 	public string value;
 
 	public override void gaxb_final(XmlReader reader, object _parent, Hashtable args) {
 		base.gaxb_final(reader, _parent, args);
 
 		if (reader != null) {
-			string s = reader.GetAttribute ("style");
-			if (s != null) {
-				string classString = "MarkdownStyle"+s;
+			style = reader.GetAttribute ("style");
 
-				Type entityClass = Type.GetType (classString, true);
-				style = (Activator.CreateInstance (entityClass)) as MarkdownStyle;
-			}
-
-			s = reader.GetAttribute ("value");
+			string s = reader.GetAttribute ("value");
 			if (s != null) {
 				value = PlanetUnityStyle.ReplaceStyleTags(PlanetUnityLanguage.Translate(s));
 			}
 		}
 
-		if (style == null) {
-			style = new MarkdownStyleGeneric();
+		if (style != null) {
+			string classString = "MarkdownStyle" + style;
+			
+			Type entityClass = Type.GetType (classString, true);
+			mdStyle = (Activator.CreateInstance (entityClass)) as MarkdownStyle;
+		} else {
+			mdStyle = new MarkdownStyleGeneric();
 		}
+
+		mdStyle.markdownEntity = this;
 
 	}
 
@@ -59,7 +64,9 @@ public class PUMarkdown : PUScrollRect {
 
 		ScheduleForUpdate ();
 
-		Update ();
+		if (PlanetUnityGameObject.MainCanvas () != null) {
+			Update ();
+		}
 	}
 
 	private float lastWidth = 0;
@@ -80,7 +87,7 @@ public class PUMarkdown : PUScrollRect {
 
 		md.ExtraMode = true;
 
-		//Debug.Log ("value: " + content);
+		Debug.Log ("value: " + content);
 
 
 		// Our job is to interface with MarkdownDeep, grab the necessary bits, and call the simplied API in MarkdownStyle
@@ -99,92 +106,92 @@ public class PUMarkdown : PUScrollRect {
 			}
 
 			if (currentBlock.blockType == BlockType.p) {
-				style.Create_P(container, currentString.ToString());
+				mdStyle.Create_P(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.h1) {
-				style.Create_H1(container, currentString.ToString());
+				mdStyle.Create_H1(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.h2) {
-				style.Create_H2(container, currentString.ToString());
+				mdStyle.Create_H2(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.h3) {
-				style.Create_H3(container, currentString.ToString());
+				mdStyle.Create_H3(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.h4) {
-				style.Create_H4(container, currentString.ToString());
+				mdStyle.Create_H4(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.h5) {
-				style.Create_H5(container, currentString.ToString());
+				mdStyle.Create_H5(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.h6) {
-				style.Create_H6(container, currentString.ToString());
+				mdStyle.Create_H6(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.hr) {
-				style.Create_HR(container);
+				mdStyle.Create_HR(container);
 			}
 
 			if (currentBlock.blockType == BlockType.quote) {
-				style.Begin_Blockquote(container);
+				mdStyle.Begin_Blockquote(container);
 			}
 
 			if (currentBlock.blockType == BlockType.quote_end) {
-				style.End_Blockquote(container);
+				mdStyle.End_Blockquote(container);
 			}
 
 			if (currentBlock.blockType == BlockType.ul) {
 				listStack.Push(currentBlock.blockType);
-				style.Begin_UnorderedList(container);
+				mdStyle.Begin_UnorderedList(container);
 			}
 			
 			if (currentBlock.blockType == BlockType.ul_end) {
 				listStack.Pop();
-				style.End_UnorderedList(container);
+				mdStyle.End_UnorderedList(container);
 			}
 
 			if (currentBlock.blockType == BlockType.ul_li) {
-				style.Create_UL_LI(container, currentString.ToString());
+				mdStyle.Create_UL_LI(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.ol) {
 				listStack.Push(currentBlock.blockType);
-				style.Begin_OrderedList(container);
+				mdStyle.Begin_OrderedList(container);
 			}
 			
 			if (currentBlock.blockType == BlockType.ol_end) {
 				listStack.Pop();
-				style.End_OrderedList(container);
+				mdStyle.End_OrderedList(container);
 			}
 			
 			if (currentBlock.blockType == BlockType.ol_li) {
-				style.Create_OL_LI(container, currentString.ToString());
+				mdStyle.Create_OL_LI(container, currentString.ToString());
 			}
 
 			if (currentBlock.blockType == BlockType.codeblock) {
-				style.Create_CodeBlock(container, currentBlock.Content);
+				mdStyle.Create_CodeBlock(container, currentBlock.Content);
 			}
 
 			if(currentBlock.blockType == BlockType.table_spec){
-				style.Create_Table(container, currentBlock.data as TableSpec);
+				mdStyle.Create_Table(container, currentBlock.data as TableSpec);
 			}
 
 			if(currentBlock.blockType == BlockType.dt){
-				style.Create_DefinitionTerm(container, currentString.ToString());
+				mdStyle.Create_DefinitionTerm(container, currentString.ToString());
 			}
 
 			if(currentBlock.blockType == BlockType.dd){
-				style.Create_DefinitionData(container, currentString.ToString());
+				mdStyle.Create_DefinitionData(container, currentString.ToString());
 			}
 
 		};
 
-		style.Begin (container);
+		mdStyle.Begin (container);
 
 		string htmlTranslation = md.Transform (content, out definitions, (block, token, tokenString) => {
 
@@ -204,7 +211,7 @@ public class PUMarkdown : PUScrollRect {
 				if(token.type == TokenType.img){
 
 					LinkInfo link = token.data as LinkInfo;
-					style.Create_IMG(container, link.def.url, link.link_text);
+					mdStyle.Create_IMG(container, link.def.url, link.link_text);
 				}
 
 				if(token.type == TokenType.Text){
@@ -213,34 +220,34 @@ public class PUMarkdown : PUScrollRect {
 
 
 				if(token.type == TokenType.code_span){
-					style.Tag_Code(container, currentString, true);
+					mdStyle.Tag_Code(container, currentString, true);
 					currentString.Append(tokenString, token.startOffset, token.length);
-					style.Tag_Code(container, currentString, false);
+					mdStyle.Tag_Code(container, currentString, false);
 				}
 
 				if(token.type == TokenType.open_strong){
-					style.Tag_Strong(container, currentString, true);
+					mdStyle.Tag_Strong(container, currentString, true);
 				}
 				
 				if(token.type == TokenType.close_strong){
-					style.Tag_Strong(container, currentString, false);
+					mdStyle.Tag_Strong(container, currentString, false);
 				}
 				
 				if(token.type == TokenType.br){
-					style.Tag_BreakingReturn(container, currentString);
+					mdStyle.Tag_BreakingReturn(container, currentString);
 				}
 
 				if(token.type == TokenType.link){
 					LinkInfo link = token.data as LinkInfo;
-					style.Tag_Link(container, currentString, link.def.url, link.link_text);
+					mdStyle.Tag_Link(container, currentString, link.def.url, link.link_text);
 				}
 				
 				if(token.type == TokenType.open_em){
-					style.Tag_Emphasis(container, currentString, true);
+					mdStyle.Tag_Emphasis(container, currentString, true);
 				}
 				
 				if(token.type == TokenType.close_em){
-					style.Tag_Emphasis(container, currentString, false);
+					mdStyle.Tag_Emphasis(container, currentString, false);
 				}
 
 
@@ -249,7 +256,7 @@ public class PUMarkdown : PUScrollRect {
 
 		CommitMarkdownBlock();
 
-		style.End (container);
+		mdStyle.End (container);
 
 		CalculateContentSize ();
 	}

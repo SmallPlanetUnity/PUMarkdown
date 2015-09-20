@@ -24,18 +24,12 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	public float fontSize = 18;
 	public string font = "Fonts/ArialRegular";
 
-	public float paragraphSpacing {
-		get {
-			return fontSize;
-		}
-	}
+	protected float currentY = 0;
+	protected Padding padding = new Padding (0, 0, 0, 0);
 
-	private float currentY = 0;
-	private Padding padding = new Padding (0, 0, 0, 0);
-
-	private Stack<float> blockquotesTop = new Stack<float>();
-	private Stack<int> listCounts = new Stack<int>();
-	private List<string> urlLinks = new List<string>();
+	protected Stack<float> blockquotesTop = new Stack<float>();
+	protected Stack<int> listCounts = new Stack<int>();
+	protected List<string> urlLinks = new List<string>();
 
 	public override void Begin(PUGameObject container) {
 		currentY = 0;
@@ -107,7 +101,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 			size = Vector2.zero.PUParse(title);
 		}
 
-		currentY -= paragraphSpacing;
+		currentY -= paragraphSpacing();
 
 		PURawImage img = new PURawImage ();
 		img.SetFrame (padding.left, currentY - padding.top, size.x, size.y, 0, 1, "top,left");
@@ -130,7 +124,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	#region Horizontal Rule
 	
 	public override void Create_HR(PUGameObject container) {
-		currentY -= paragraphSpacing;
+		currentY -= paragraphSpacing();
 
 		PUColor color = new PUColor ();
 		color.color = new Color(0.8f, 0.8f, 0.8f, 1.0f);
@@ -167,7 +161,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 		float margin = fontSize;
 
-		currentY -= paragraphSpacing;
+		currentY -= paragraphSpacing();
 
 		float savedY = currentY;
 
@@ -382,7 +376,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	public PUTMPro AddTextWithOptions(PUGameObject container, string content, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
 
-		currentY -= paragraphSpacing;
+		currentY -= paragraphSpacing();
 
 		float maxWidth = container.size.Value.x - (padding.left + padding.right);
 		
@@ -398,7 +392,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		if (urlLinks.Count > 0) {
 			string[] linkURLs = urlLinks.ToArray();
 			text.OnLinkClickAction = (linkText,linkIdx) => {
-				Application.OpenURL(linkURLs[linkIdx]);
+				OpenLink(linkURLs[linkIdx]);
 			};
 			urlLinks.Clear();
 		}
@@ -415,7 +409,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		return text;
 	}
 
-	public Color textColor() {
+	public virtual Color textColor() {
 		Color color = Color.black;
 		
 		if (blockquotesTop.Count > 0) {
@@ -423,6 +417,10 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		}
 
 		return color;
+	}
+
+	public virtual float paragraphSpacing() {
+		return fontSize;
 	}
 
 	public void PutTextInBox(PUGameObject container, PUTMPro text, float margin, Color outlineColor, Color backgroundColor) {
@@ -444,6 +442,10 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		text.rectTransform.anchorMin = Vector2.zero;
 		text.SetStretchStretch (margin, margin, margin, margin);
 
+	}
+
+	public virtual void OpenLink(string link) {
+		Application.OpenURL(link);
 	}
 
 	#endregion
