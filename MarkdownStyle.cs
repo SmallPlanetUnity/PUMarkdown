@@ -197,6 +197,10 @@ public class MarkdownStyle {
 
 
 	#region Inline tags
+	
+	public virtual void Tag_Link(PUGameObject container, StringBuilder content, string url, string text) {
+		content.AppendFormat ("[link]{0}[/link]", text);
+	}
 
 	public virtual void Tag_BreakingReturn(PUGameObject container, StringBuilder content) {
 		content.Append ("\n");

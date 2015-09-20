@@ -16,6 +16,7 @@ using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 using MarkdownDeep;
+using System.Text;
 
 public class MarkdownStyleGeneric : MarkdownStyle {
 
@@ -34,6 +35,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	private Stack<float> blockquotesTop = new Stack<float>();
 	private Stack<int> listCounts = new Stack<int>();
+	private List<string> urlLinks = new List<string>();
 
 	public override void Begin(PUGameObject container) {
 		currentY = 0;
@@ -366,6 +368,16 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	#endregion
 
 
+	#region Links
+
+	public override void Tag_Link(PUGameObject container, StringBuilder content, string url, string text) {
+		urlLinks.Add (url);
+		content.AppendFormat ("<#5a92c9ff><u>\x0b{0}\x0c</u></color>", text);
+	}
+
+	#endregion
+
+
 	#region Utility
 
 	public PUTMPro AddTextWithOptions(PUGameObject container, string content, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
@@ -382,7 +394,18 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		text.fontSize = (int)(fontSize*fontScale);
 		text.alignment = alignment;
 		text.value = content;
+
+		if (urlLinks.Count > 0) {
+			string[] linkURLs = urlLinks.ToArray();
+			text.OnLinkClickAction = (linkText,linkIdx) => {
+				Application.OpenURL(linkURLs[linkIdx]);
+			};
+			urlLinks.Clear();
+		}
+
 		text.LoadIntoPUGameObject (container);
+
+
 
 		Vector2 size = text.CalculateTextSize (content, maxWidth);
 		text.rectTransform.sizeDelta = size;

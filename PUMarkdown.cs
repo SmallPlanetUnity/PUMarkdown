@@ -227,6 +227,11 @@ public class PUMarkdown : PUScrollRect {
 				if(token.type == TokenType.br){
 					style.Tag_BreakingReturn(container, currentString);
 				}
+
+				if(token.type == TokenType.link){
+					LinkInfo link = token.data as LinkInfo;
+					style.Tag_Link(container, currentString, link.def.url, link.link_text);
+				}
 				
 				if(token.type == TokenType.open_em){
 					style.Tag_Emphasis(container, currentString, true);
