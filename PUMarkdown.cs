@@ -70,11 +70,18 @@ public class PUMarkdown : PUScrollRect {
 	}
 
 	private float lastWidth = 0;
+	private float lastHeight = 0;
 	public override void Update () {
-		if (lastWidth != rectTransform.rect.size.x) {
+		if (lastWidth != rectTransform.rect.size.x ||
+		    lastHeight != rectTransform.rect.size.y) {
 			lastWidth = rectTransform.rect.size.x;
-			LoadMarkdown(value);
+			lastHeight = rectTransform.rect.size.y;
+			Reload();
 		}
+	}
+
+	public void Reload() {
+		LoadMarkdown(value);
 	}
 
 	public void LoadMarkdown(string content) {
@@ -86,9 +93,6 @@ public class PUMarkdown : PUScrollRect {
 		Dictionary<string, LinkDefinition> definitions;
 
 		md.ExtraMode = true;
-
-		Debug.Log ("value: " + content);
-
 
 		// Our job is to interface with MarkdownDeep, grab the necessary bits, and call the simplied API in MarkdownStyle
 		StringBuilder currentString = new StringBuilder ();
@@ -259,6 +263,12 @@ public class PUMarkdown : PUScrollRect {
 		mdStyle.End (container);
 
 		CalculateContentSize ();
+
+		// disable scrolling if we fit...
+		RectTransform myRectTransform = (RectTransform)contentObject.transform;
+		if (myRectTransform.rect.height < this.rectTransform.rect.height) {
+			scroll.enabled = false;
+		}
 	}
 
 }
