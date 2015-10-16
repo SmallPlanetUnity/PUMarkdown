@@ -268,6 +268,8 @@ public class PUMarkdown : PUScrollRect {
 		RectTransform myRectTransform = (RectTransform)contentObject.transform;
 		if (myRectTransform.rect.height < this.rectTransform.rect.height) {
 			scroll.enabled = false;
+		} else {
+			scroll.enabled = true;
 		}
 	}
 
