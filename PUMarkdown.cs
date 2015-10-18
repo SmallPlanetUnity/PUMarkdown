@@ -28,6 +28,8 @@ public class PUMarkdown : PUScrollRect {
 	public string style;
 	public string value;
 
+	public bool autoreload = true;
+
 	public override void gaxb_final(XmlReader reader, object _parent, Hashtable args) {
 		base.gaxb_final(reader, _parent, args);
 
@@ -37,6 +39,11 @@ public class PUMarkdown : PUScrollRect {
 			string s = reader.GetAttribute ("value");
 			if (s != null) {
 				value = PlanetUnityStyle.ReplaceStyleTags(PlanetUnityLanguage.Translate(s));
+			}
+
+			s = reader.GetAttribute ("autoreload");
+			if (s != null) {
+				autoreload = bool.Parse(s);
 			}
 		}
 
@@ -72,11 +79,29 @@ public class PUMarkdown : PUScrollRect {
 	private float lastWidth = 0;
 	private float lastHeight = 0;
 	public override void Update () {
+
+
+		// disable scrolling if we fit...
+		RectTransform myRectTransform = (RectTransform)contentObject.transform;
+		if (myRectTransform.rect.height < this.rectTransform.rect.height) {
+			if(scroll.enabled != false){
+				scroll.enabled = false;
+			}
+		} else {
+			if(scroll.enabled != true){
+				scroll.enabled = true;
+			}
+		}
+
+		if (autoreload == false && lastWidth != 0 && lastHeight != 0) {
+			return;
+		}
+
 		if (lastWidth != rectTransform.rect.size.x ||
-		    lastHeight != rectTransform.rect.size.y) {
+			lastHeight != rectTransform.rect.size.y) {
 			lastWidth = rectTransform.rect.size.x;
 			lastHeight = rectTransform.rect.size.y;
-			Reload();
+			Reload ();
 		}
 	}
 
@@ -263,14 +288,6 @@ public class PUMarkdown : PUScrollRect {
 		mdStyle.End (container);
 
 		CalculateContentSize ();
-
-		// disable scrolling if we fit...
-		RectTransform myRectTransform = (RectTransform)contentObject.transform;
-		if (myRectTransform.rect.height < this.rectTransform.rect.height) {
-			scroll.enabled = false;
-		} else {
-			scroll.enabled = true;
-		}
 	}
 
 }
