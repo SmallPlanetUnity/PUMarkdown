@@ -63,6 +63,15 @@ public class MarkdownStyle {
 
 	public PUMarkdown markdownEntity;
 
+	public virtual string DefaultFont() {
+		return "Fonts/ARIAL_SDF";
+	}
+	
+	public virtual float DefaultFontSize() {
+		return PlanetUnityStyle.GlobalFontSize;
+	}
+
+
 	public virtual void Begin(PUGameObject container) {
 		
 	}

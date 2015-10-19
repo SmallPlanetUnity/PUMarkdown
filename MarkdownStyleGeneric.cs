@@ -20,10 +20,7 @@ using System.Text;
 
 public class MarkdownStyleGeneric : MarkdownStyle {
 
-
-	public float fontSize = 18;
-	public string font = "Fonts/ArialRegular";
-
+	
 	protected float currentY = 0;
 	protected Padding padding = new Padding (0, 0, 0, 0);
 
@@ -55,11 +52,11 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	}
 	
 	public override void Create_DefinitionData(PUGameObject container, string content) {
-		currentY += fontSize * 0.8f;
+		currentY += DefaultFontSize() * 0.8f;
 
-		padding.left += fontSize * 1.0f;
+		padding.left += DefaultFontSize() * 1.0f;
 		AddTextWithOptions (container, content, textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
-		padding.left -= fontSize * 1.0f;
+		padding.left -= DefaultFontSize() * 1.0f;
 	}
 	
 	#endregion
@@ -140,15 +137,15 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 		float margin = 10;
 
-		padding.left += fontSize * 2.0f;
-		padding.right += fontSize * 2.0f;
+		padding.left += DefaultFontSize() * 2.0f;
+		padding.right += DefaultFontSize() * 2.0f;
 
 		PUTMPro text = AddTextWithOptions (container, content, textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
 
 		PutTextInBox (container, text, margin, new Color32 (204, 204, 204, 255), new Color32 (248, 248, 248, 255));
 
-		padding.left -= fontSize * 2.0f;
-		padding.right -= fontSize * 2.0f;
+		padding.left -= DefaultFontSize() * 2.0f;
+		padding.right -= DefaultFontSize() * 2.0f;
 
 		currentY -= margin;
 	}
@@ -159,7 +156,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	
 	public override void Create_Table(PUGameObject container, TableSpec spec) {
 
-		float margin = fontSize;
+		float margin = DefaultFontSize();
 
 		currentY -= paragraphSpacing();
 
@@ -263,7 +260,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	public override void Begin_Blockquote(PUGameObject container) {
 		padding.left += 16;
-		blockquotesTop.Push (currentY - fontSize);
+		blockquotesTop.Push (currentY - DefaultFontSize());
 	}
 	
 	public override void End_Blockquote(PUGameObject container) {
@@ -293,22 +290,23 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	public override void Create_UL_LI(PUGameObject container, string content) {
 
 		if (listCounts.Peek() != 0) {
-			currentY += fontSize * 0.5f;
+			currentY += DefaultFontSize() * 0.5f;
 		}
 		
 		float oldY = currentY;
 		
-		padding.left += fontSize * 2.0f;
+		padding.left += DefaultFontSize() * 2.0f;
 		Create_P(container, content);
-		padding.left -= fontSize * 2.0f;
+		padding.left -= DefaultFontSize() * 2.0f;
 
 		PUTMPro text = new PUTMPro ();
-		text.SetFrame (padding.left, currentY - padding.top, fontSize * 1.5f, (oldY - currentY) - fontSize, 0, 0, "top,left");
-		text.font = font;
+		text.SetFrame (padding.left, currentY - padding.top, DefaultFontSize() * 1.5f, (oldY - currentY) - DefaultFontSize(), 0, 0, "top,left");
+		text.font = DefaultFont();
 		text.value = "•";
 		text.fontColor = textColor();
 		text.fontStyle = "Bold";
-		text.fontSize = (int)(fontSize);
+		text.fontSize = (int)(DefaultFontSize());
+		text.sizeToFit = true;
 		text.alignment = TMPro.TextAlignmentOptions.TopRight;
 		text.enableWordWrapping = false;
 		text.LoadIntoPUGameObject (container);
@@ -334,22 +332,23 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	public override void Create_OL_LI(PUGameObject container, string content) {
 		
 		if (listCounts.Peek() != 0) {
-			currentY += fontSize * 0.5f;
+			currentY += DefaultFontSize() * 0.5f;
 		}
 
 		float oldY = currentY;
 		
-		padding.left += fontSize * 2.0f;
+		padding.left += DefaultFontSize() * 2.0f;
 		Create_P(container, content);
-		padding.left -= fontSize * 2.0f;
+		padding.left -= DefaultFontSize() * 2.0f;
 
 		PUTMPro text = new PUTMPro ();
-		text.SetFrame (padding.left, currentY - padding.top, fontSize * 1.5f, (oldY - currentY) - fontSize, 0, 0, "top,left");
-		text.font = font;
+		text.SetFrame (padding.left, currentY - padding.top, DefaultFontSize() * 1.5f, (oldY - currentY) - DefaultFontSize(), 0, 0, "top,left");
+		text.font = DefaultFont();
 		text.value = string.Format ("{0}.", listCounts.Peek () + 1);
 		text.fontColor = textColor();
 		text.fontStyle = "Bold";
-		text.fontSize = (int)(fontSize);
+		text.fontSize = (int)(DefaultFontSize());
+		text.sizeToFit = true;
 		text.alignment = TMPro.TextAlignmentOptions.TopRight;
 		text.enableWordWrapping = false;
 		text.LoadIntoPUGameObject (container);
@@ -382,10 +381,11 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		
 		PUTMPro text = new PUTMPro ();
 		text.SetFrame (padding.left, currentY - padding.top, maxWidth, 0, 0, 1, "top,left");
-		text.font = font;
+		text.font = DefaultFont();
 		text.fontColor = color;
 		text.fontStyle = style;
-		text.fontSize = (int)(fontSize*fontScale);
+		text.fontSize = (int)(DefaultFontSize()*fontScale);
+		text.sizeToFit = true;
 		text.alignment = alignment;
 		text.value = content;
 
@@ -420,7 +420,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	}
 
 	public virtual float paragraphSpacing() {
-		return fontSize;
+		return DefaultFontSize();
 	}
 
 	public void PutTextInBox(PUGameObject container, PUTMPro text, float margin, Color outlineColor, Color backgroundColor) {
