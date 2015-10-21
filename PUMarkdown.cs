@@ -86,6 +86,7 @@ public class PUMarkdown : PUScrollRect {
 		if (myRectTransform.rect.height < this.rectTransform.rect.height) {
 			if(scroll.enabled != false){
 				scroll.enabled = false;
+				myRectTransform.anchoredPosition = Vector2.zero;
 			}
 		} else {
 			if(scroll.enabled != true){
