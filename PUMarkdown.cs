@@ -21,7 +21,7 @@ using System.Text;
 
 public class PUMarkdown : PUScrollRect {
 
-	private MarkdownStyle mdStyle;
+	public MarkdownStyle mdStyle;
 
 	public Action<string> onLinkClicked;
 
@@ -29,6 +29,7 @@ public class PUMarkdown : PUScrollRect {
 	public string value;
 
 	public bool autoreload = true;
+	public bool delayedLoad = false;
 
 	public override void gaxb_final(XmlReader reader, object _parent, Hashtable args) {
 		base.gaxb_final(reader, _parent, args);
@@ -72,7 +73,9 @@ public class PUMarkdown : PUScrollRect {
 		ScheduleForUpdate ();
 
 		if (PlanetUnityGameObject.MainCanvas () != null) {
-			Update ();
+			if(delayedLoad == false){
+				Update ();
+			}
 		}
 	}
 
