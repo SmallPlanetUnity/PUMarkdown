@@ -40,7 +40,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	#region BODY
 	
 	public override void Create_P(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, textColor(), 1.0f, "Normal", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), textColor(), 1.0f, "Normal", TMPro.TextAlignmentOptions.Left);
 	}
 
 	#endregion
@@ -48,14 +48,14 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	#region Definitions
 	
 	public override void Create_DefinitionTerm(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, textColor(), 1.0f, "BoldItalic", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), textColor(), 1.0f, "BoldItalic", TMPro.TextAlignmentOptions.Left);
 	}
 	
 	public override void Create_DefinitionData(PUGameObject container, string content) {
 		currentY += DefaultFontSize() * 0.8f;
 
 		padding.left += DefaultFontSize() * 1.0f;
-		AddTextWithOptions (container, content, textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
 		padding.left -= DefaultFontSize() * 1.0f;
 	}
 	
@@ -64,27 +64,27 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	#region HEADERS
 
 	public override void Create_H1(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, Color.black, 2.0f, "Bold", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), Color.black, 2.0f, "Bold", TMPro.TextAlignmentOptions.Left);
 	}
 
 	public override void Create_H2(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, Color.black, 1.71f, "Bold", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), Color.black, 1.71f, "Bold", TMPro.TextAlignmentOptions.Left);
 	}
 
 	public override void Create_H3(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, Color.black, 1.28f, "Bold", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), Color.black, 1.28f, "Bold", TMPro.TextAlignmentOptions.Left);
 	}
 
 	public override void Create_H4(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, Color.black, 1.14f, "Bold", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), Color.black, 1.14f, "Bold", TMPro.TextAlignmentOptions.Left);
 	}
 
 	public override void Create_H5(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, Color.black, 1.0f, "Bold", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), Color.black, 1.0f, "Bold", TMPro.TextAlignmentOptions.Left);
 	}
 
 	public override void Create_H6(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, Color.grey, 1.0f, "Bold", TMPro.TextAlignmentOptions.Left);
+		AddTextWithOptions (container, content, DefaultFont(), Color.grey, 1.0f, "Bold", TMPro.TextAlignmentOptions.Left);
 	}
 
 	#endregion
@@ -140,7 +140,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		padding.left += DefaultFontSize() * 2.0f;
 		padding.right += DefaultFontSize() * 2.0f;
 
-		PUTMPro text = AddTextWithOptions (container, content, textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
+		PUTMPro text = AddTextWithOptions (container, content, DefaultFont(), textColor(), 0.8f, "Normal", TMPro.TextAlignmentOptions.Left);
 
 		PutTextInBox (container, text, margin, new Color32 (204, 204, 204, 255), new Color32 (248, 248, 248, 255));
 
@@ -184,7 +184,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 				tmAlignment = TMPro.TextAlignmentOptions.Center;
 			}
 
-			PUTMPro text = AddTextWithOptions (tableGroup, header, textColor(), 1.0f, "Bold", tmAlignment);
+			PUTMPro text = AddTextWithOptions (tableGroup, header, DefaultFont(), textColor(), 1.0f, "Bold", tmAlignment);
 			Vector2 size = text.rectTransform.sizeDelta + new Vector2(margin*2.0f,margin);
 
 			text.rectTransform.pivot = Vector2.zero;
@@ -226,7 +226,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 				}
 
 
-				PUTMPro text = AddTextWithOptions (tableGroup, row, textColor(), 1.0f, "Normal", tmAlignment);
+				PUTMPro text = AddTextWithOptions (tableGroup, row, DefaultFont(), textColor(), 1.0f, "Normal", tmAlignment);
 				Vector2 size = text.rectTransform.sizeDelta + new Vector2(margin*2.0f,margin);
 
 				text.rectTransform.pivot = Vector2.zero;
@@ -373,15 +373,17 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	#region Utility
 
-	public PUTMPro AddTextWithOptions(PUGameObject container, string content, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
+	public PUTMPro AddTextWithOptions(PUGameObject container, string content, string fontPath, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
 
-		currentY -= paragraphSpacing();
+		if (currentY != 0) {
+			currentY -= paragraphSpacing ();
+		}
 
 		float maxWidth = container.size.Value.x - (padding.left + padding.right);
 		
 		PUTMPro text = new PUTMPro ();
 		text.SetFrame (padding.left, currentY - padding.top, maxWidth, 0, 0, 1, "top,left");
-		text.font = DefaultFont();
+		text.font = fontPath;
 		text.fontColor = color;
 		text.fontStyle = style;
 		text.fontSize = (int)(DefaultFontSize()*fontScale);
