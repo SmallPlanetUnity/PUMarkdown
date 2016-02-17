@@ -117,6 +117,8 @@ public class PUMarkdown : PUScrollRect {
 		// first, clear ourselves
 		unloadAllChildren ();
 
+		value = content;
+
 		// run the parser on the content
 		Markdown md = new Markdown ();
 		Dictionary<string, LinkDefinition> definitions;
