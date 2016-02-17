@@ -172,40 +172,42 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		int numberOfCols = 0;
 		int numberOfRows = 0;
 
-		for(int i = 0; i < spec.Headers.Count; i++) {
-			string header = spec.Headers[i];
-			ColumnAlignment alignment = spec.Columns[i];
+		if (spec.Headers != null) {
+			for (int i = 0; i < spec.Headers.Count; i++) {
+				string header = spec.Headers [i];
+				ColumnAlignment alignment = spec.Columns [i];
 
-			TMPro.TextAlignmentOptions tmAlignment = TMPro.TextAlignmentOptions.Left;
-			if(alignment == ColumnAlignment.Right){
-				tmAlignment = TMPro.TextAlignmentOptions.Right;
-			}
-			if(alignment == ColumnAlignment.Center){
-				tmAlignment = TMPro.TextAlignmentOptions.Center;
-			}
+				TMPro.TextAlignmentOptions tmAlignment = TMPro.TextAlignmentOptions.Left;
+				if (alignment == ColumnAlignment.Right) {
+					tmAlignment = TMPro.TextAlignmentOptions.Right;
+				}
+				if (alignment == ColumnAlignment.Center) {
+					tmAlignment = TMPro.TextAlignmentOptions.Center;
+				}
 
-			PUTMPro text = AddTextWithOptions (tableGroup, header, DefaultFont(), textColor(), 1.0f, "Bold", tmAlignment);
-			Vector2 size = text.rectTransform.sizeDelta + new Vector2(margin*2.0f,margin);
+				PUTMPro text = AddTextWithOptions (tableGroup, header, DefaultFont (), textColor (), 1.0f, "Bold", tmAlignment);
+				Vector2 size = text.rectTransform.sizeDelta + new Vector2 (margin * 2.0f, margin);
 
-			text.rectTransform.pivot = Vector2.zero;
-			text.rectTransform.anchorMax = Vector2.one;
-			text.rectTransform.anchorMin = Vector2.zero;
+				text.rectTransform.pivot = Vector2.zero;
+				text.rectTransform.anchorMax = Vector2.one;
+				text.rectTransform.anchorMin = Vector2.zero;
 
-			PutTextInBox (tableGroup, text, 2, new Color32 (204, 204, 204, 255), new Color32 (255, 255, 255, 255));
-			text.SetStretchStretch (margin*0.5f, margin, margin*0.5f, margin);
+				PutTextInBox (tableGroup, text, 2, new Color32 (204, 204, 204, 255), new Color32 (255, 255, 255, 255));
+				text.SetStretchStretch (margin * 0.5f, margin, margin * 0.5f, margin);
 
-			if(size.x > maxCellWidth){
-				maxCellWidth = size.x;
-			}
-			if(size.y > maxCellHeight){
-				maxCellHeight = size.y;
+				if (size.x > maxCellWidth) {
+					maxCellWidth = size.x;
+				}
+				if (size.y > maxCellHeight) {
+					maxCellHeight = size.y;
+				}
 			}
 		}
 
 		numberOfCols = spec.Rows[0].Count;
 		numberOfRows = spec.Rows.Count;
 
-		if (spec.Headers.Count > 0) {
+		if (spec.Headers != null && spec.Headers.Count > 0) {
 			numberOfRows++;
 		}
 		
