@@ -39,7 +39,7 @@ public class PUMarkdown : PUScrollRect {
 
 			string s = reader.GetAttribute ("value");
 			if (s != null) {
-				value = PlanetUnityStyle.ReplaceStyleTags(PlanetUnityLanguage.Translate(s));
+				value = PlanetUnityStyle.ReplaceStyleTags(s);
 			}
 
 			s = reader.GetAttribute ("autoreload");
