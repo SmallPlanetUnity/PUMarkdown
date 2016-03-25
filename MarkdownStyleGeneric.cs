@@ -375,7 +375,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	#region Utility
 
-	public PUTMPro AddTextWithOptions(PUGameObject container, string content, string fontPath, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
+	public virtual PUTMPro AddTextWithOptions(PUGameObject container, string content, string fontPath, Color color, float fontScale, string style, TMPro.TextAlignmentOptions alignment) {
 
 		if (currentY != 0) {
 			currentY -= paragraphSpacing ();
