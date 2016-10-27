@@ -31,18 +31,18 @@ public class PUMarkdown : PUScrollRect {
 	public bool autoreload = true;
 	public bool delayedLoad = false;
 
-	public override void gaxb_final(XmlReader reader, object _parent, Hashtable args) {
-		base.gaxb_final(reader, _parent, args);
+	public override void gaxb_final(TB.TBXMLElement element, object _parent, Hashtable args) {
+		base.gaxb_final(element, _parent, args);
 
-		if (reader != null) {
-			style = reader.GetAttribute ("style");
+		if (element != null) {
+			style = element.GetAttribute ("style");
 
-			string s = reader.GetAttribute ("value");
+			string s = element.GetAttribute ("value");
 			if (s != null) {
 				value = PlanetUnityStyle.ReplaceStyleTags(PlanetUnityOverride.processString(this, s));
 			}
 
-			s = reader.GetAttribute ("autoreload");
+			s = element.GetAttribute ("autoreload");
 			if (s != null) {
 				autoreload = bool.Parse(s);
 			}
