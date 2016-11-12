@@ -367,7 +367,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	public override void Tag_Link(PUGameObject container, StringBuilder content, string url, string text) {
 		urlLinks.Add (url);
-		content.AppendFormat ("<#5a92c9ff><u>\x0b{0}\x0c</u></color>", text);
+		content.AppendFormat ("<#5a92c9ff><link>{0}</link></color>", text);
 	}
 
 	#endregion
