@@ -313,7 +313,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		text.enableWordWrapping = false;
 		text.LoadIntoPUGameObject (container);
 		
-		text.textGUI.OverflowMode = TMPro.TextOverflowModes.Overflow;
+		text.textGUI.overflowMode = TMPro.TextOverflowModes.Overflow;
 		
 		listCounts.Push(listCounts.Pop() + 1);
 	}
@@ -355,7 +355,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 		text.enableWordWrapping = false;
 		text.LoadIntoPUGameObject (container);
 
-		text.textGUI.OverflowMode = TMPro.TextOverflowModes.Overflow;
+		text.textGUI.overflowMode = TMPro.TextOverflowModes.Overflow;
 		
 		listCounts.Push(listCounts.Pop() + 1);
 	}
