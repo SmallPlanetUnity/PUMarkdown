@@ -29,6 +29,7 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 	protected List<string> urlLinks = new List<string>();
 
 	public override void Begin(PUGameObject container) {
+		padding = new Padding (0, 0, 0, 0);
 		currentY = 0;
 		blockquotesTop.Clear ();
 	}
