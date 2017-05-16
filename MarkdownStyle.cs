@@ -82,8 +82,8 @@ public class MarkdownStyle {
 
 	#region Body
 
-	public virtual void Create_P(PUGameObject container, string content) {
-
+	public virtual PUTMPro Create_P(PUGameObject container, string content) {
+		return null;
 	}
 
 	#endregion

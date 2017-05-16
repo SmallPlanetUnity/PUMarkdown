@@ -39,8 +39,8 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 	#region BODY
 	
-	public override void Create_P(PUGameObject container, string content) {
-		AddTextWithOptions (container, content, DefaultFont(), textColor(), 1.0f, "Normal", TMPro.TextAlignmentOptions.Left);
+	public override PUTMPro Create_P(PUGameObject container, string content) {
+		return AddTextWithOptions (container, content, DefaultFont(), textColor(), 1.0f, "Normal", TMPro.TextAlignmentOptions.Left);
 	}
 
 	#endregion
