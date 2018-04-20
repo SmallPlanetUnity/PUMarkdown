@@ -83,19 +83,26 @@ public class PUMarkdown : PUScrollRect {
 	private float lastHeight = 0;
 	public override void Update () {
 
-
-		// disable scrolling if we fit...
-		RectTransform myRectTransform = (RectTransform)contentObject.transform;
-		if (myRectTransform.rect.height < this.rectTransform.rect.height) {
-			if(scroll.enabled != false){
-				scroll.enabled = false;
-				myRectTransform.anchoredPosition = Vector2.zero;
-			}
-		} else {
-			if(scroll.enabled != true){
-				scroll.enabled = true;
-			}
-		}
+        if (Input.GetMouseButton(0) == false)
+        {
+            // disable scrolling if we fit...
+            RectTransform myRectTransform = (RectTransform)contentObject.transform;
+            if (myRectTransform.rect.height < this.rectTransform.rect.height)
+            {
+                if (scroll.enabled != false)
+                {
+                    scroll.enabled = false;
+                    myRectTransform.anchoredPosition = Vector2.zero;
+                }
+            }
+            else
+            {
+                if (scroll.enabled != true)
+                {
+                    scroll.enabled = true;
+                }
+            }
+        }
 
 		if (autoreload == false && lastWidth != 0 && lastHeight != 0) {
 			return;
