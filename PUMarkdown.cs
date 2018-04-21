@@ -121,6 +121,11 @@ public class PUMarkdown : PUScrollRect {
 	}
 
 	public void LoadMarkdown(string content) {
+        if (Application.isEditor)
+        {
+            Debug.Log(content);
+        }
+
 		// first, clear ourselves
 		unloadAllChildren ();
 

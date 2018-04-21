@@ -137,6 +137,24 @@ namespace MarkdownDeep
 			b.Append("</table>\n");
 		}
 
+        public static TableSpec ParseTableFromString(String s) {
+            StringScanner scanner = new StringScanner(s);
+            TableSpec spec = TableSpec.Parse(scanner);
+            while (scanner.eof == false)
+            {
+                var row = spec.ParseRow(scanner);
+                if (row != null)
+                {
+                    spec.Rows.Add(row);
+                }
+                else
+                {
+                    scanner.SkipForward(1);
+                }
+            }
+            return spec;
+        }
+
 		public static TableSpec Parse(StringScanner p)
 		{
 			// Leading line space allowed
