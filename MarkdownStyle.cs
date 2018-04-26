@@ -33,14 +33,50 @@ public class MarkdownRemoteImageLoader : MonoBehaviour {
 	public string path;
 	public Action onComplete;
 	private WWW www;
-	
-	void Start() {
-		if (path.StartsWith ("http://") || path.StartsWith ("https://")) {
-			www = new WWW (path);
-			return;
-		}
-		www = new WWW ("file://" + path);
-	}
+
+    void Start()
+    {
+        // Check to see if this is an app resource, if so load it directly
+        RawImage rawImage = GetComponent<RawImage>();
+        if (rawImage != null)
+        {
+            Texture2D localImage = PlanetUnityResourceCache.GetTexture(path);
+            if(localImage != null){
+                rawImage.texture = localImage;
+                if (onComplete != null)
+                {
+                    onComplete();
+                }
+                GameObject.Destroy(this);
+                return;
+            }
+        }
+
+        // Check to see if this is an app resource, if so load it directly
+        Image image = GetComponent<Image>();
+        if (image != null)
+        {
+            Sprite localSprite = PlanetUnityResourceCache.GetSprite(path, true);
+            if (localSprite != null)
+            {
+                image.sprite = localSprite;
+                if (onComplete != null)
+                {
+                    onComplete();
+                }
+                GameObject.Destroy(this);
+                return;
+            }
+        }
+
+
+        if (path.StartsWith("http://") || path.StartsWith("https://"))
+        {
+            www = new WWW(path);
+            return;
+        }
+        www = new WWW("file://" + path);
+    }
 	
 	void Update() {
 		if (www.isDone) {
