@@ -269,12 +269,13 @@ public class MarkdownStyle {
 		}
 	}
 
-	public virtual void Tag_Code(PUGameObject container, StringBuilder content, bool isOpen) {
+	public virtual bool Tag_Code(PUGameObject container, StringBuilder content, String codeContent, bool isOpen) {
 		if (isOpen) {
 			content.Append ("<u>");
 		} else {
 			content.Append ("</u>");
 		}
+        return true;
 	}
 
 	#endregion

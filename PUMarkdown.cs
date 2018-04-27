@@ -266,11 +266,13 @@ public class PUMarkdown : PUScrollRect {
 				}
 
 
-				if(token.type == TokenType.code_span){
-					mdStyle.Tag_Code(container, currentString, true);
-					currentString.Append(tokenString, token.startOffset, token.length);
-					mdStyle.Tag_Code(container, currentString, false);
-				}
+                if (token.type == TokenType.code_span) {
+                    string codeContent = tokenString.Substring(token.startOffset, token.length);
+                    if (mdStyle.Tag_Code(container, currentString, codeContent, true)) {
+                        currentString.Append(codeContent);
+                    }
+                    mdStyle.Tag_Code(container, currentString, codeContent, false);
+                }
 
 				if(token.type == TokenType.open_strong){
 					mdStyle.Tag_Strong(container, currentString, true);
