@@ -31,65 +31,56 @@ public struct Padding {
 
 public class MarkdownRemoteImageLoader : MonoBehaviour {
 	public string path;
-	public Action onComplete;
+	public Action<Vector2> onComplete;
 	private WWW www;
 
-    void Start()
-    {
-        // Check to see if this is an app resource, if so load it directly
-        RawImage rawImage = GetComponent<RawImage>();
-        if (rawImage != null)
-        {
-            Texture2D localImage = PlanetUnityResourceCache.GetTexture(path);
-            if(localImage != null){
-                rawImage.texture = localImage;
-                if (onComplete != null)
-                {
-                    onComplete();
-                }
-                GameObject.Destroy(this);
-                return;
-            }
-        }
+	void Start ()
+	{
+		// Check to see if this is an app resource, if so load it directly
+		Texture2D localImage = PlanetUnityResourceCache.GetTexture (path);
+		if (localImage != null) {
+			RawImage rawImage = gameObject.AddComponent<RawImage> ();
+			rawImage.texture = localImage;
+			if (onComplete != null) {
+				onComplete (new Vector2 (rawImage.texture.width, rawImage.texture.height));
+			}
+			GameObject.Destroy (this);
+			return;
+		}
 
-        // Check to see if this is an app resource, if so load it directly
-        Image image = GetComponent<Image>();
-        if (image != null)
-        {
-            Sprite localSprite = PlanetUnityResourceCache.GetSprite(path, true);
-            if (localSprite != null)
-            {
-                image.sprite = localSprite;
-                if (onComplete != null)
-                {
-                    onComplete();
-                }
-                GameObject.Destroy(this);
-                return;
-            }
-        }
+		// Check to see if this is an app resource, if so load it directly
+		Sprite localSprite = PlanetUnityResourceCache.GetSprite (path, true);
+		if (localSprite != null) {
+			Image image = gameObject.AddComponent<Image> ();
+			image.sprite = localSprite;
+			if (onComplete != null) {
+				onComplete (image.sprite.rect.size);
+			}
+			GameObject.Destroy (this);
+			return;
+		}
 
 
-        if (path.StartsWith("http://") || path.StartsWith("https://"))
-        {
-            www = new WWW(path);
-            return;
-        }
-        www = new WWW("file://" + path);
-    }
-	
-	void Update() {
+		if (path.StartsWith ("http://") || path.StartsWith ("https://")) {
+			www = new WWW (path);
+			return;
+		}
+		www = new WWW ("file://" + path);
+	}
+
+	void Update ()
+	{
 		if (www.isDone) {
-			RawImage rawImage = GetComponent<RawImage>();
-			if(rawImage != null){
+			RawImage rawImage = gameObject.AddComponent<RawImage> ();
+			if (rawImage != null) {
 				rawImage.texture = www.texture;
 				rawImage.texture.wrapMode = TextureWrapMode.Clamp;
-				if(onComplete != null){
-					onComplete();
+				if (onComplete != null) {
+					onComplete (new Vector2 (rawImage.texture.width, rawImage.texture.height));
 				}
 			}
-			
-			www.Dispose();
+
+			www.Dispose ();
 			GameObject.Destroy (this);
 		}
 	}

@@ -101,17 +101,14 @@ public class MarkdownStyleGeneric : MarkdownStyle {
 
 		currentY -= paragraphSpacing();
 
-		PURawImage img = new PURawImage ();
+		PUGameObject img = new PUGameObject ();
 		img.SetFrame (padding.left, currentY - padding.top, size.x, size.y, 0, 1, "top,left");
 		img.LoadIntoPUGameObject (container);
 
 		MarkdownRemoteImageLoader loader = img.gameObject.AddComponent<MarkdownRemoteImageLoader> ();
 		loader.path = url;
-		loader.onComplete = () => {
-			// now that we have this image, adjust the size?
-			int w = img.image.texture.width;
-			int h = img.image.texture.height;
-			img.rectTransform.sizeDelta = new Vector2(w, h);
+		loader.onComplete = (imgSize) => {
+			img.rectTransform.sizeDelta = imgSize;
 		};
 
 		currentY -= size.y;
